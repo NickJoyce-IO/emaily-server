@@ -26,6 +26,7 @@ passport.use(
       clientID: keys.googleClientID,
       clientSecret: keys.googleClientSecret,
       callbackURL: '/auth/google/callback',
+      proxy: true
     },
     // gets called once we have been successfully back to the server and gives us
     // tokens back from Google
