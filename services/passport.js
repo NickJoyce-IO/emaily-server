@@ -8,15 +8,14 @@ const User = mongoose.model('users')
 
 // serialize the user with the mongo user id
 passport.serializeUser((user, done) => {
-    done(null, user.id)
+  done(null, user.id)
 })
 
 // find the user by the id and return the user
 passport.deserializeUser((id, done) => {
-    User.findById(id)
-        .then(user => {
-            done(null, user)
-        })
+  User.findById(id).then((user) => {
+    done(null, user)
+  })
 })
 
 // Set up passport to use Google for auth
@@ -26,24 +25,21 @@ passport.use(
       clientID: keys.googleClientID,
       clientSecret: keys.googleClientSecret,
       callbackURL: '/auth/google/callback',
-      proxy: true
+      proxy: true,
     },
     // gets called once we have been successfully back to the server and gives us
     // tokens back from Google
-    (accessToken, refreshToken, profile, done) => {
-      User.findOne({ googleId: profile.id })
-        // query will return the instance object of what it found
-        .then((existingUser) => {
-          if (existingUser) {
-            // user already exists nothing to do
-            done(null, existingUser)
-          } else {
-            // get the GoogleID and save to database
-            new User({ googleId: profile.id })
-              .save()
-              .then((user) => done(null, user))
-          }
-        })
+    async (accessToken, refreshToken, profile, done) => {
+      const existingUser = await User.findOne({ googleId: profile.id })
+      // query will return the instance object of what it found
+
+      if (existingUser) {
+        // user already exists nothing to do
+        return done(null, existingUser)
+      } 
+        // get the GoogleID and save to database
+        const user = await new User({ googleId: profile.id }).save()
+        done(null, user)
     }
   )
 )
