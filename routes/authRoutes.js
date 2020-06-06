@@ -10,14 +10,20 @@ module.exports = (app) => {
   )
 
   // route handler to handle the callback from Google
-  app.get('/auth/google/callback', passport.authenticate('google'))
+  app.get(
+    '/auth/google/callback',
+    passport.authenticate('google'),
+    (req, res) => {
+      res.redirect('/surveys')
+    }
+  )
 
   // logout route handler
   app.get('/api/logout', (req, res) => {
     req.logout()
-    res.send(req.user)
+    res.redirect('/')
   })
-  
+
   // Get the current logged in user
   app.get('/api/current_user', (req, res) => {
     res.send(req.user)
