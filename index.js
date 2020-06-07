@@ -3,7 +3,17 @@ const mongoose = require('mongoose')
 const cookieSession = require('cookie-session')
 const passport = require('passport')
 const keys = require('./config/keys')
-const bodyParser =require('body-parser')
+const bodyParser = require('body-parser')
+const morgan = require('morgan')
+const Sentry = require('@sentry/node')
+const fs = require('fs')
+const path = require('path')
+
+// Set up monitoring
+Sentry.init({
+  dsn:
+    'https://3e223b83e093450792369f711bdbf8e0@o404118.ingest.sentry.io/5267427',
+})
 
 // Set up user collection
 require('./models/User')
@@ -19,6 +29,10 @@ mongoose.connect(keys.mongoURI, {
 
 // Set up the app
 const app = express()
+
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'))
+
+app.use(morgan('combined', { stream: accessLogStream }))
 
 app.use(bodyParser.json())
 
@@ -48,7 +62,7 @@ if (process.env.NODE_ENV === 'production') {
 
   // Express will serve up index.html if it doesn't recognise the route
   // CATCH ALL ROUTES, goes to index.html
-  const path = require('path')
+  
   app.get('*', (req,res) => {
     res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
   })
