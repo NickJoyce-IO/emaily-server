@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const cookieSession = require('cookie-session')
 const passport = require('passport')
 const keys = require('./config/keys')
+const bodyParser =require('body-parser')
 
 // Set up user collection
 require('./models/User')
@@ -19,6 +20,8 @@ mongoose.connect(keys.mongoURI, {
 // Set up the app
 const app = express()
 
+app.use(bodyParser.json())
+
 // set up express to use cookies
 app.use(
     cookieSession({
@@ -31,8 +34,11 @@ app.use(
 app.use(passport.initialize())
 app.use(passport.session())
 
-// Auth routes are defined in the authRoutes file, pass in the app
+
+// Routes
+
 require('./routes/authRoutes')(app)
+require('./routes/billingRoutes')(app)
 
 const PORT = process.env.PORT || 5000
 
