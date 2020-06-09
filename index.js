@@ -9,7 +9,7 @@ const Sentry = require('@sentry/node')
 const fs = require('fs')
 const path = require('path')
 
-// Set up monitoring
+// Set up Sentry Error Monitoring 
 Sentry.init({
   dsn:
     'https://3e223b83e093450792369f711bdbf8e0@o404118.ingest.sentry.io/5267427',
@@ -17,6 +17,9 @@ Sentry.init({
 
 // Set up user collection
 require('./models/User')
+
+// Set up Survey collection
+require('./models/Survey')
 
 // as not returning anything we can just run it
 require('./services/passport')
@@ -32,8 +35,11 @@ const app = express()
 
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'))
 
+// MIDDLEWARES
+// Add Morgan to log the API Calls
 app.use(morgan('combined', { stream: accessLogStream }))
 
+// Add bodyparser to add route arguments onto res.body
 app.use(bodyParser.json())
 
 // set up express to use cookies
@@ -50,9 +56,9 @@ app.use(passport.session())
 
 
 // Routes
-
 require('./routes/authRoutes')(app)
 require('./routes/billingRoutes')(app)
+require('./routes/surveyRoutes')(app)
 
 // code to make app behave when deployed to Prod/Heroku
 
